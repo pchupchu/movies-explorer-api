@@ -11,6 +11,8 @@ module.exports = {
   rules: {
     'import/no-extraneous-dependencies': 'off',
     'consistent-return': 'off',
+    'no-console': 'off',
+    'func-names': 'off',
     'no-underscore-dangle': ['error', { allow: ['_id'] }],
   },
 };
