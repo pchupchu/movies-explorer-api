@@ -3,7 +3,7 @@ const validator = require('validator');
 
 module.exports.validationSignup = celebrate({
   body: Joi.object().keys({
-    name: Joi.string().min(2).max(30),
+    name: Joi.string().required().min(2).max(30),
     email: Joi.string()
       .required()
       .custom((value, helpers) => {
@@ -51,8 +51,12 @@ module.exports.validationUpdateUser = celebrate({
 
 module.exports.validationCreateMovie = celebrate({
   body: Joi.object().keys({
-    name: Joi.string().required().min(2).max(30),
-    link: Joi.string()
+    country: Joi.string().required(),
+    director: Joi.string().required(),
+    duration: Joi.number().required(),
+    year: Joi.string().required(),
+    description: Joi.string().required(),
+    image: Joi.string()
       .required()
       .custom((value, helpers) => {
         const options = {
@@ -66,11 +70,42 @@ module.exports.validationCreateMovie = celebrate({
           custom: 'Неправильный формат ссылки',
         });
       }),
+    trailerLink: Joi.string()
+      .required()
+      .custom((value, helpers) => {
+        const options = {
+          protocols: ['http', 'https'],
+          require_protocol: true,
+        };
+        if (validator.isURL(value, options)) {
+          return value;
+        }
+        return helpers.message({
+          custom: 'Неправильный формат ссылки',
+        });
+      }),
+    thumbnail: Joi.string()
+      .required()
+      .custom((value, helpers) => {
+        const options = {
+          protocols: ['http', 'https'],
+          require_protocol: true,
+        };
+        if (validator.isURL(value, options)) {
+          return value;
+        }
+        return helpers.message({
+          custom: 'Неправильный формат ссылки',
+        });
+      }),
+    movieId: Joi.number().required(),
+    nameRU: Joi.string().required(),
+    nameEN: Joi.string().required(),
   }),
 });
 
 module.exports.validationMovieId = celebrate({
   params: Joi.object().keys({
-    cardId: Joi.string().length(24).hex().required(),
+    movieId: Joi.string().length(24).hex().required(),
   }),
 });

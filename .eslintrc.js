@@ -13,6 +13,7 @@ module.exports = {
     'consistent-return': 'off',
     'no-console': 'off',
     'func-names': 'off',
+    'max-len': ['error', { code: 120 }],
     'no-underscore-dangle': ['error', { allow: ['_id'] }],
   },
 };

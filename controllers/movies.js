@@ -6,11 +6,15 @@ const Forbidden = require('../errors/forbidden');
 
 module.exports.createMovie = (req, res, next) => {
   const owner = req.user._id;
-  const { name, link } = req.body;
+  const {
+    country, director, duration, year, description, image, trailerLink, nameRU, nameEN, thumbnail, movieId,
+  } = req.body;
 
-  Movie.create({ name, link, owner })
-    .then((card) => Movie.findById(card._id).populate('owner'))
-    .then((card) => res.status(201).send({ data: card }))
+  Movie.create({
+    country, director, duration, year, description, image, trailerLink, nameRU, nameEN, thumbnail, movieId, owner,
+  })
+    .then((movie) => Movie.findById(movie._id).populate('owner'))
+    .then((movie) => res.status(201).send({ data: movie }))
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) {
         return next(
@@ -24,22 +28,25 @@ module.exports.createMovie = (req, res, next) => {
 module.exports.getMovies = (req, res, next) => {
   Movie.find({})
     .populate('owner')
-    .then((cards) => res.send({ data: cards }))
+    .then((movies) => {
+      const userMovies = movies.filter((movie) => movie.owner.id === req.user._id);
+      res.send({ data: userMovies });
+    })
     .catch(next);
 };
 
 module.exports.deleteMovie = (req, res, next) => {
-  Movie.findById(req.params.cardId)
-    .then((card) => {
-      if (!card) {
-        return next(new NotFoundError('Карточка с указанным _id не найдена'));
+  Movie.findById(req.params.movieId)
+    .then((movie) => {
+      if (!movie) {
+        return next(new NotFoundError('Фильм с указанным _id не найден'));
       }
-      if (card.owner.toString() !== req.user._id) {
+      if (movie.owner.toString() !== req.user._id) {
         return next(
-          new Forbidden('Вы не можете удалить карточку другого пользователя'),
+          new Forbidden('Вы не можете удалить фильм другого пользователя'),
         );
       }
-      return Movie.findByIdAndDelete(req.params.cardId).then(() => res.send({ data: card }));
+      return Movie.findByIdAndDelete(req.params.movieId).then(() => res.send({ data: movie }));
     })
     .catch((err) => {
       if (err instanceof mongoose.Error.CastError) {
