@@ -77,6 +77,11 @@ module.exports.updateUser = (req, res, next) => {
           new BadRequest('Переданы некорректные данные при обновлении профиля'),
         );
       }
+      if (err.code === 11000) {
+        return next(
+          new Conflict('Пользователь с таким email уже существует'),
+        );
+      }
       next(err);
     });
 };
