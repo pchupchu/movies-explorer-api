@@ -9,9 +9,7 @@ const Conflict = require('../errors/conflict');
 const { NODE_ENV, JWT_SECRET } = process.env;
 
 module.exports.createUser = (req, res, next) => {
-  const {
-    name, email, password,
-  } = req.body;
+  const { name, email, password } = req.body;
   bcrypt
     .hash(password, 6)
     .then((hash) => {
@@ -29,14 +27,12 @@ module.exports.createUser = (req, res, next) => {
         .catch((err) => {
           if (err instanceof mongoose.Error.ValidationError) {
             return next(
-              new BadRequest(
-                'Переданы некорректные данные при создании пользователя',
-              ),
+              new BadRequest('При регистрации пользователя произошла ошибка.'),
             );
           }
           if (err.code === 11000) {
             return next(
-              new Conflict('Пользователь с таким email уже существует'),
+              new Conflict('Пользователь с таким email уже существует.'),
             );
           }
           next(err);
@@ -73,14 +69,10 @@ module.exports.updateUser = (req, res, next) => {
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) {
-        return next(
-          new BadRequest('Переданы некорректные данные при обновлении профиля'),
-        );
+        return next(new BadRequest('При обновлении профиля произошла ошибка.'));
       }
       if (err.code === 11000) {
-        return next(
-          new Conflict('Пользователь с таким email уже существует'),
-        );
+        return next(new Conflict('Пользователь с таким email уже существует.'));
       }
       next(err);
     });
@@ -90,9 +82,13 @@ module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
   return User.findUserByCredentials(email, password)
     .then((user) => {
-      const token = jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : 'super-strong-secret', {
-        expiresIn: '7d',
-      });
+      const token = jwt.sign(
+        { _id: user._id },
+        NODE_ENV === 'production' ? JWT_SECRET : 'super-strong-secret',
+        {
+          expiresIn: '7d',
+        },
+      );
 
       res.send({ token });
     })

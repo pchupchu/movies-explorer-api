@@ -10,6 +10,6 @@ router.use('/users', auth, userRouter);
 router.use('/movies', auth, movieRouter);
 router.post('/signin', validationSignin, login);
 router.post('/signup', validationSignup, createUser);
-router.use('*', auth, (req, res, next) => next(new NotFoundError('Запрашиваемый адрес не найден')));
+router.use('*', auth, (req, res, next) => next(new NotFoundError('Страница по указанному маршруту не найдена.')));
 
 module.exports = router;
